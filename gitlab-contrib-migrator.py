@@ -2,6 +2,20 @@
 
 import sys
 from datetime import datetime
+from bs4 import BeautifulSoup
+
+
+def parseHTMLAndCreateCommits(htmlContents, startDate):
+    fullHtml = BeautifulSoup(htmlContents, 'html.parser')
+    dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell js-tooltip"})
+    for dateRect in dateRects:
+        contribsAndDate = dateRect["data-original-title"].split("<br />")
+        contribCount = int(contribsAndDate[0].split(" ")[0])
+        date = datetime.strptime(contribsAndDate[1], '%A %b %d, %Y')
+        if startDate != -1 and startDate <= date:
+            # createNumOfCommitsOnDate()
+            print(contribCount, date)
+    print("Created commits for contrib chart! Use 'git push' to push to remote or use 'git log' to check commit log")
 
 
 def parseArgs(argv):
@@ -23,7 +37,8 @@ def parseArgs(argv):
     return (htmlContents, -1)
 
 def main(argv):
-    parseArgs(argv)
+    htmlContents, startDate = parseArgs(argv)
+    parseHTMLAndCreateCommits(htmlContents, startDate)
 
 
 if __name__ == "__main__":
