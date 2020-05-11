@@ -4,9 +4,10 @@ import sys
 from datetime import datetime
 from bs4 import BeautifulSoup
 import os
+from tqdm import tqdm
 
 def createNumOfCommitsOnDate(numOfCommits, date):
-    for i in range(numOfCommits):
+    for i in tqdm(range(numOfCommits)):
         os.system('echo "Commit number {} on {}" >> commit.md'.format((i+1), date.strftime("%m-%d-%Y")))
         os.system('export GIT_COMMITTER_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
         os.system('export GIT_AUTHOR_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
@@ -17,7 +18,7 @@ def parseHTMLAndCreateCommits(htmlContents, startDate):
     fullHtml = BeautifulSoup(htmlContents, 'html.parser')
     dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell js-tooltip"})
     print("Starting commits!\n")
-    for dateRect in dateRects:
+    for dateRect in tqdm(dateRects):
         contribsAndDate = dateRect["data-original-title"].split("<br />")
         contribCount = int(contribsAndDate[0].split(" ")[0])
         date = datetime.strptime(contribsAndDate[1], '%A %b %d, %Y')
