@@ -3,18 +3,26 @@
 import sys
 from datetime import datetime
 from bs4 import BeautifulSoup
+import os
 
+def createNumOfCommitsOnDate(numOfCommits, date):
+    for i in range(numOfCommits):
+        os.system('echo "Commit number {} on {}" >> commit.md'.format((i+1), date.strftime("%m-%d-%Y")))
+        os.system('export GIT_COMMITTER_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
+        os.system('export GIT_AUTHOR_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
+        os.system('git add --all > /dev/null')
+        os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" > /dev/null'.format( date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y")))
 
 def parseHTMLAndCreateCommits(htmlContents, startDate):
     fullHtml = BeautifulSoup(htmlContents, 'html.parser')
     dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell js-tooltip"})
+    print("Starting commits!\n")
     for dateRect in dateRects:
         contribsAndDate = dateRect["data-original-title"].split("<br />")
         contribCount = int(contribsAndDate[0].split(" ")[0])
         date = datetime.strptime(contribsAndDate[1], '%A %b %d, %Y')
-        if startDate != -1 and startDate <= date:
-            # createNumOfCommitsOnDate()
-            print(contribCount, date)
+        if startDate == -1 or startDate <= date:
+            createNumOfCommitsOnDate(contribCount, date)
     print("Created commits for contrib chart! Use 'git push' to push to remote or use 'git log' to check commit log")
 
 
