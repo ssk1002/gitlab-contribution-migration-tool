@@ -6,4 +6,5 @@ Usage:
 gitlab-contrib-migrator.py \<htmlFile\> \<startDate\>
 
 htmlFile = HTML file with GitLab info
+
 startDate = start commit date in MM-DD-YYYY format
