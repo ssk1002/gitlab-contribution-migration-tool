@@ -20,10 +20,10 @@ def parseHTMLAndCreateCommits(htmlContents, startDate):
     print("Starting commits!\n")
     for dateRect in tqdm(dateRects):
         contribsAndDate = dateRect["data-original-title"].split("<br />")
-           try:
+        try:
             contribCount = int(contribsAndDate[0].split(" ")[0])
         except ValueError:
-            continue;
+            continue
         date = datetime.strptime(contribsAndDate[1], '%A %b %d, %Y')
         if startDate == -1 or startDate <= date:
             createNumOfCommitsOnDate(contribCount, date)
