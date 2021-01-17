@@ -7,20 +7,27 @@ import os
 from tqdm import tqdm
 
 def createNumOfCommitsOnDate(numOfCommits, date):
+    path   = ''
+    setter = 'set'
+
+    if os.name != 'nt': # Windows
+        path   = '> /dev/null' 
+        setter = 'export'
+
     for i in tqdm(range(numOfCommits)):
         os.system('echo "Commit number {} on {}" >> commit.md'.format((i+1), date.strftime("%m-%d-%Y")))
-        os.system('export GIT_COMMITTER_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
-        os.system('export GIT_AUTHOR_DATE="{} 12:00:00"'.format(date.strftime("%m-%d-%Y")))
-        os.system('git add --all > /dev/null')
-        os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" > /dev/null'.format( date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y")))
-
+        os.system('{} GIT_COMMITTER_DATE="{} 12:00:00"'.format(setter, date.strftime("%m-%d-%Y")))
+        os.system('{} GIT_AUTHOR_DATE="{} 12:00:00"'.format(setter, date.strftime("%m-%d-%Y")))
+        os.system('git add --all {}'.format(path))
+        os.system('git commit --date="{} 12:00:00" -m "Commit number {} on {}" {}'.format(date.strftime("%Y-%m-%d"), (i+1), date.strftime("%m-%d-%Y"), path))
+    
 def parseHTMLAndCreateCommits(htmlContents, startDate):
     fullHtml = BeautifulSoup(htmlContents, 'html.parser')
     dateRects = fullHtml.find_all("rect", {"class": "user-contrib-cell js-tooltip"})
     print("Starting commits!\n")
     for dateRect in tqdm(dateRects):
         contribsAndDate = dateRect["data-original-title"].split("<br />")
-           try:
+        try:
             contribCount = int(contribsAndDate[0].split(" ")[0])
         except ValueError:
             continue;
